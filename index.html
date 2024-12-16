@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparativa de Energías</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: "Times New Roman", Times, serif;
+            margin: 0;
+            padding: 0;
+            background-color: #d6f8ff;
+        }
+
+        header {
+            background-color: #002c5e;
+            color: white;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        section {
+            margin: 20px;
+        }
+
+        #result-container {
+            margin-top: 20px;
+        }
+
+        .video-section {
+            margin-top: 40px;
+        }
+
+        iframe {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .buttons {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Nuevo estilo para el contenedor de la gráfica */
+        #chart-container {
+            width: 600px; /* Tamaño fijo */
+            height: 400px; /* Tamaño fijo */
+            margin: 0 auto; /* Centrado */
+            background-color: white; /* Fondo blanco para la gráfica */
+            padding: 20px;
+            border: 2px solid #002c5e; /* Borde para distinguir la gráfica */
+            border-radius: 10px; /* Bordes redondeados */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Comparativa de Energías</h1>
+    </header>
+
+    <section>
+        <h2>Selecciona una fuente de energía</h2>
+        <div class="buttons">
+            <button onclick="showData(0)">Energía Solar</button>
+            <button onclick="showData(1)">Energía Eólica</button>
+            <button onclick="showData(2)">Energía Convencional</button>
+        </div>
+
+        <div id="result-container">
+            <!-- Resultados dinámicos -->
+        </div>
+    </section>
+
+    <!-- Contenedor fijo para la gráfica -->
+    <section id="chart-container">
+        <canvas id="energyChart" width="400" height="200"></canvas>
+    </section>
+
+    <section class="video-section">
+        <h2>Ejemplo gráfico</h2>
+        <p id="video-description"></p>
+
+        <!-- Video de YouTube incrustado -->
+        <iframe id="dynamicVideo" width="780" height="420" 
+            src="" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </section>
+
+    <script>
+        // Datos energéticos (watts por día, semana, mes y año)
+        const energyData = [
+            { type: 'Solar', day: 5, week: 35, month: 150, year: 1800 },
+            { type: 'Eólica', day: 8, week: 56, month: 240, year: 2880 },
+            { type: 'Convencional', day: 15, week: 105, month: 450, year: 5400 }
+        ];
+
+        // Links de videos en YouTube
+        const videoData = [
+           	 'https://www.youtube.com/embed/i2QhzXpysOw?playlist=i2QhzXpysOw&loop=1&autoplay=1&mute=1', // Solar
+   		 'https://www.youtube.com/embed/kjAU89Oe4pU?playlist=kjAU89Oe4pU&loop=1&autoplay=1&mute=1', // Eólica
+   		 'https://www.youtube.com/embed/fsBmQ_aII80?playlist=fsBmQ_aII80&loop=1&autoplay=1&mute=1'  // Eléctrica
+        ];
+
+        // Descripciones de los videos
+        const descriptions = [
+            `La energía solar es una fuente renovable que utiliza la radiación del sol para generar electricidad o calor de manera limpia y sostenible. Se obtiene mediante sistemas fotovoltaicos, que convierten la luz solar en electricidad, o sistemas fototérmicos, que generan calor. Los paneles solares, compuestos por celdas fotovoltaicas de materiales semiconductores como el silicio, captan la luz del sol y la transforman en energía eléctrica para alimentar hogares, empresas e industrias. Entre los beneficios de la energía solar se destacan la reducción de emisiones de carbono, su carácter inagotable y su eficiencia, gracias a los avances tecnológicos. En México, el costo promedio de un sistema fotovoltaico para una capacidad de 5 kW oscila entre $15,000 y $25,000 MXN, siendo una inversión que se amortiza con los ahorros energéticos a largo plazo. Los componentes principales del sistema fotovoltaico incluyen los paneles solares, que generan corriente directa (DC); el inversor, que convierte esta corriente en alterna (AC); el panel eléctrico, que distribuye la electricidad generada; y el medidor de utilidad, que mide la energía producida y consumida, permitiendo compensar el consumo nocturno con el excedente generado. El funcionamiento básico de un sistema solar se basa en celdas solares que, al captar la luz, separan electrones y generan una diferencia de potencial, produciendo electricidad que puede almacenarse o usarse directamente. Este modelo eficiente está promoviendo el uso de la energía solar como una solución confiable y sostenible.`,
+            `La energía eólica utiliza la fuerza del viento para generar electricidad a través de aerogeneradores en parques eólicos. Es una fuente renovable que no produce residuos peligrosos ni emisiones tóxicas, ayudando a reducir el calentamiento global al mitigar más de 12 millones de toneladas de gases de efecto invernadero. Los parques eólicos pueden coexistir con actividades como la agricultura y la ganadería. Existen tres tipos de parques eólicos: los on-shore, en tierra y alejados de la costa; los near-shore, cerca de la costa; y los off-shore, en mar abierto, donde los vientos son más constantes. Los aerogeneradores se conectan mediante cables subterráneos a una cabina central desde donde se distribuye la energía. También hay versiones domésticas, con costos de instalación que varían entre $40,000 MXN y más de $120,000 MXN, dependiendo de la complejidad. Los aerogeneradores pueden ser de eje horizontal, más eficientes pero menos funcionales con vientos débiles, o de eje vertical, menos eficientes pero que no requieren mecanismos de orientación y pueden instalarse cerca del suelo.`,
+            `La electricidad se genera por el movimiento de electrones entre dos puntos con una diferencia de potencial y puede provenir de fuentes renovables o no renovables, como los combustibles fósiles (petróleo, gas natural y carbón) y la energía nuclear. En México, la Comisión Federal de Electricidad establece tarifas que varían según el consumo y la región, con costos que pueden oscilar entre $0.755 y $6.188 MXN por kWh, dependiendo de factores como la temperatura. La eficiencia energética busca reducir el consumo, las emisiones contaminantes y los costos, a través de hábitos y tecnologías más eficientes, lo que también impulsa el uso de energías alternativas. En el sector industrial, que consume el 29% de la energía total, la implementación de estas estrategias es clave para mejorar la competitividad y optimizar los recursos. `
+        ];
+
+        // Mostrar resultados y gráfico
+        function showData(index) {
+            const energy = energyData[index];
+            const resultContainer = document.getElementById('result-container');
+
+            // Mostrar resultados
+            resultContainer.innerHTML = `
+                <p>Fuente: <strong>${energy.type}</strong></p>
+                <p>Energía por Día: <strong>${energy.day} kWh</strong></p>
+                <p>Energía por Semana: <strong>${energy.week} kWh</strong></p>
+                <p>Energía por Mes: <strong>${energy.month} kWh</strong></p>
+                <p>Energía por Año: <strong>${energy.year} kWh</strong></p>
+            `;
+
+            // Actualizar gráfico
+            chart.data.datasets[0].data = [energy.day, energy.week, energy.month, energy.year];
+            chart.update();
+
+            // Mostrar video relacionado
+            const videoElement = document.getElementById('dynamicVideo');
+            videoElement.src = videoData[index];
+
+            // Actualizar descripción
+            const videoDescription = document.getElementById('video-description');
+            videoDescription.textContent = descriptions[index];
+        }
+
+        // Configuración del gráfico
+        const ctx = document.getElementById('energyChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Día', 'Semana', 'Mes', 'Año'],
+                datasets: [{
+                    label: 'Consumo de Energía (kWh)',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
